@@ -18,13 +18,19 @@ def establish_connection(connection_data=None):
                                                                      connection_data['user'],
                                                                      connection_data['host'],
                                                                      connection_data['password'])
-        conn = psycopg2.connect(connect_str)
+        conn = psyconnect(connect_str)
         conn.autocommit = True
     except psycopg2.DatabaseError as e:
         print("Cannot connect to database.")
         print(e)
     else:
         return conn
+
+
+def psyconnect(connection_string):
+    connection = psycopg2.connect(connection_string)
+    connection.autocommit = True
+    return connection
 
 
 def get_unset_vars(var_names):
