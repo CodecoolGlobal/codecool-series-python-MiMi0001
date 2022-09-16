@@ -1,11 +1,15 @@
 console.log('Hi!');
-const pageElements = {
+const pageInfo = {
     tableBody : null,
-    pageNavDiv  : null,
-    pageLinks : null,
+    navContainer  : null,
+    navLinks : null,
+    
+    origLinkColor : null,
+    
     showsCount : null,
     pageCount : null,
-    origLinkColor : null,
+    currentPage : null,
+    offset : null,
 }
 
 
@@ -13,19 +17,25 @@ initPage();
 
 
 async function initPage(){
-    pageElements.tableBody = document.getElementById('tbody');
-    pageElements.pageNavDiv = document.getElementById('page-navigation')
-    pageElements.showsCount = await getShowsCount();
-    pageElements.pageCount = Math.ceil(pageElements.showsCount / 15);
 
-    createPageNav()
+    pageInfo.tableBody = document.getElementById('tbody');
+    pageInfo.navContainer = document.getElementById('page-navigation')
 
-    pageElements.pageLinks = document.querySelectorAll('.page-links');
-    pageElements.origLinkColor = pageElements.pageLinks[0].style.color;
+    pageInfo.showsCount = await getShowsCount();
+    pageInfo.pageCount = Math.ceil(pageInfo.showsCount / 15);
+    pageInfo.currentPage = 1;
+
+    createPageNav();
+
+    pageInfo.pageLinks = document.querySelectorAll('.page-links');
+    pageInfo.origLinkColor = pageInfo.pageLinks[0].style.color;
+
+    setPageLinksColor();
 
     addEventListeners();
 
-    insertShowRows(0);
+    pageInfo.offset = 0;
+    insertShowRows();
 
 };
 
@@ -38,77 +48,58 @@ async function getShowsCount(){
 
 
 function createPageNav(){
+
     let prev = document.createElement('a');
     prev.classList.add('page-links');
     prev.dataset.page = 'prev';
     prev.href = 'https://google.com';
     prev.textContent = '<<';
-    pageElements.pageNavDiv.appendChild(prev);
+    pageInfo.navContainer.appendChild(prev);
 
-    for (let i=1; i<=pageElements.pageCount; i++){
+    for (let i= 1; i<=5; i++){
         let anchor = document.createElement('a');
-        anchor.classList.add('page-links');
-        anchor.dataset.page = i;
-        anchor.textContent = ` ${i} `;
-        anchor.href = 'https://google.com';
-        pageElements.pageNavDiv.appendChild(anchor);
-    }
+            anchor.classList.add('page-links');
+            anchor.dataset.page = i;
+            anchor.textContent = ` ${i} `;
+            anchor.href = 'https://google.com';
+            pageInfo.navContainer.appendChild(anchor);
+        }
 
     let next = document.createElement('a');
     next.classList.add('page-links');
     next.dataset.page = 'next';
     next.href = 'https://google.com';
     next.textContent = '>>';
-    pageElements.pageNavDiv.appendChild(next);
-}
-
-
-function resetNavsColor(){
-    for (let link of pageElements.pageLinks) {
-        link.style.color = pageElements.origLinkColor;
-    }
+    pageInfo.navContainer.appendChild(next);
 }
 
 
 function addEventListeners(){
-    for (let link of pageElements.pageLinks){
+
+    for (let link of pageInfo.pageLinks){
         link.addEventListener('click', (event) => {
             event.preventDefault();
 
             if ( event.target.dataset.page == 'next' || event.target.dataset.page == 'prev' ){
-                let offset = +pageElements.tableBody.dataset.offset;
                 if (event.target.dataset.page == 'prev'){
-                    if (offset >= 15){
-                        offset -= 15;
-                        pageElements.tableBody.dataset.offset = offset;
-                        insertShowRows(offset);
-                    }
+                    if (pageInfo.offset >= 15) pageInfo.offset -= 15;
                 }
                 else if (event.target.dataset.page == 'next'){
-                    if (offset <= pageElements.showsCount-15){
-                        offset += 15;
-                        pageElements.tableBody.dataset.offset = offset;
-                        insertShowRows(offset);
-                    }
+                    if (pageInfo.offset <= pageInfo.showsCount-15) pageInfo.offset += 15;
                 }
             }
-            else {
-                let offset = ((event.target.dataset.page) - 1) * 15;
-                pageElements.tableBody.dataset.offset = offset;
-                insertShowRows(offset);
-            }
+            else pageInfo.offset = ((event.target.dataset.page) - 1) * 15;
+
+            pageInfo.currentPage = Math.trunc( (pageInfo.offset+15)/15 );
+            insertShowRows();
+            reFormatLinks();
         })
     }
+
 }
 
 
-async function insertShowRows(offset){
-
-    pageElements.tableBody.dataset.offset = offset;
-    pageElements.tableBody.dataset.page = Math.trunc( (offset+15)/15 );
-
-    resetNavsColor();
-    pageElements.pageLinks[pageElements.tableBody.dataset.page].style.color = 'red';
+async function insertShowRows(){
 
     let showRows = document.querySelectorAll('.show-row');
     let i = 1;
@@ -124,7 +115,7 @@ async function insertShowRows(offset){
             headers: {
                         'Content-Type': 'application/json'
                     },
-            body: JSON.stringify({'offset': offset})
+            body: JSON.stringify({'offset': pageInfo.offset})
         });
     let showsArray = await showsResult.json();
 
@@ -182,9 +173,43 @@ async function insertShowRows(offset){
         }
 
         setTimeout(()=>{
-            pageElements.tableBody.appendChild(tr);
+            pageInfo.tableBody.appendChild(tr);
         }, i*100);
         i++;
     }
+}
 
+
+function reFormatLinks(){
+    let startNum= 0;
+
+    if (pageInfo.currentPage == 1) startNum = 1;
+    if (pageInfo.currentPage == 2) startNum = 1;
+    if (pageInfo.currentPage >=3 && pageInfo.currentPage <= pageInfo.pageCount-2) startNum = pageInfo.currentPage - 2;
+    if (pageInfo.currentPage == pageInfo.pageCount-1) startNum = pageInfo.currentPage-3;
+    if (pageInfo.currentPage == pageInfo.pageCount) startNum = pageInfo.currentPage-4;
+
+    let i = startNum;
+    for (let link of pageInfo.pageLinks) {
+        if (link.dataset.page != 'next' && link.dataset.page != 'prev') {
+            link.textContent = ` ${i} `;
+            link.dataset.page = i;
+            i++;
+        }
+    }
+
+    setPageLinksColor();
+}
+
+
+function setPageLinksColor(){
+    for (let link of pageInfo.pageLinks) {
+        +link.dataset.page === pageInfo.currentPage ? link.style.color = 'red' : link.style.color = pageInfo.origLinkColor;
+        if (link.dataset.page === 'prev'){
+            pageInfo.currentPage === 1 ? link.hidden = true : link.hidden = false;
+        }
+        if (link.dataset.page === 'next'){
+            pageInfo.currentPage === pageInfo.pageCount ? link.hidden = true : link.hidden = false;
+        }
+    }
 }
