@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, jsonify, request
+from flask import Flask, render_template, url_for, jsonify, request, redirect
 from data import queries
 import math
 from dotenv import load_dotenv
@@ -17,6 +17,11 @@ def design():
     return render_template('design.html')
 
 
+@app.route('/shows')
+def show():
+    return redirect(url_for('most_rated'))
+
+
 @app.route('/shows/most-rated')
 def most_rated():
     return render_template('most_rated.html')
@@ -31,15 +36,10 @@ def count_shows():
 @app.route('/get-shows', methods=['POST'])
 def get_shows():
     offset = request.get_json()['offset']
-    shows = queries.get_all_shows_w_offset(offset)
-
-    result = []
-    for show in shows:
-        row = {}
-        for field in show.keys():
-            row[field] = show[field]
-        result.append(row)
-
+    order_by = request.get_json()['order_by']
+    order_direction = request.get_json()['order_direction']
+    shows = queries.get_all_shows_w_params(str(offset), str(order_by), str(order_direction))
+    print(shows)
     return jsonify(shows)
 
 

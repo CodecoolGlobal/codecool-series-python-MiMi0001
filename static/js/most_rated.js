@@ -3,6 +3,7 @@ const pageInfo = {
     tableBody : null,
     navContainer  : null,
     navLinks : null,
+    tableHeaders : null,
     
     origLinkColor : null,
     
@@ -10,6 +11,9 @@ const pageInfo = {
     pageCount : null,
     currentPage : null,
     offset : null,
+
+    orderBy : null,
+    orderDirection : null
 }
 
 
@@ -19,11 +23,15 @@ initPage();
 async function initPage(){
 
     pageInfo.tableBody = document.getElementById('tbody');
-    pageInfo.navContainer = document.getElementById('page-navigation')
+    pageInfo.navContainer = document.getElementById('page-navigation');
+    pageInfo.tableHeaders = document.querySelectorAll('.theader');
 
     pageInfo.showsCount = await getShowsCount();
     pageInfo.pageCount = Math.ceil(pageInfo.showsCount / 15);
     pageInfo.currentPage = 1;
+    pageInfo.offset = 0;
+    pageInfo.orderBy = 'rating';
+    pageInfo.orderDirection = 'DESC';
 
     createPageNav();
 
@@ -34,7 +42,6 @@ async function initPage(){
 
     addEventListeners();
 
-    pageInfo.offset = 0;
     insertShowRows();
 
 };
@@ -96,6 +103,39 @@ function addEventListeners(){
         })
     }
 
+    for (let header of pageInfo.tableHeaders){
+        header.addEventListener('click', (event)=> {
+            event.preventDefault();
+
+            if (event.target.classList.contains('orderby')) toggleOrderDirection();
+
+            clearOrderBy();
+
+            event.target.classList.add('orderby');
+            if (pageInfo.orderDirection === 'DESC') header.textContent = header.textContent+'⇩';
+            else header.textContent = header.textContent + '⇧';
+
+            pageInfo.orderBy = event.target.dataset['orderby'];
+            insertShowRows();
+        } )
+    }
+
+}
+
+
+function toggleOrderDirection(){
+    pageInfo.orderDirection === 'DESC' ? pageInfo.orderDirection='ASC' : pageInfo.orderDirection='DESC';
+}
+
+
+function clearOrderBy(){
+    for (let header of pageInfo.tableHeaders){
+        if (header.classList.contains('orderby')) {
+            header.classList.remove('orderby');
+            let length = header.textContent.length;
+            header.textContent = header.textContent.substring(0, length - 1);
+        }
+    }
 }
 
 
@@ -115,7 +155,9 @@ async function insertShowRows(){
             headers: {
                         'Content-Type': 'application/json'
                     },
-            body: JSON.stringify({'offset': pageInfo.offset})
+            body: JSON.stringify({'offset': pageInfo.offset,
+                                        'order_by': pageInfo.orderBy,
+                                        'order_direction':pageInfo.orderDirection})
         });
     let showsArray = await showsResult.json();
 

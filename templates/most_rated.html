@@ -28,6 +28,8 @@
 
     <!-- page specific styling -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style/detailed-view.css') }}">
+
+    <!-- JavaScript file -->
     <script src="{{ url_for('static', filename='js/most_rated.js') }}" defer></script>
 </head>
 
@@ -52,10 +54,10 @@
             <table>
                 <thead>
                 <tr>
-                    <th> Title </th>
-                    <th> Year </th>
-                    <th> Runtime (min) </th>
-                    <th> Rating </th>
+                    <th> <a class="theader" data-orderby="title">Title</a> </th>
+                    <th> <a class="theader" data-orderby="year">Year</a> </th>
+                    <th> <a class="theader" data-orderby="runtime">Runtime (min)</a> </th>
+                    <th> <a class="theader orderby" data-orderby="rating">Rating⇩</a> </th>
                     <th> Genres </th>
                     <th> Trailer </th>
                     <th> Homepage </th>
