@@ -28,6 +28,7 @@
 
     <!-- page specific styling -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style/detailed-view.css') }}">
+    <script src="{{ url_for('static', filename='js/most_rated.js') }}" defer></script>
 </head>
 
 <body>
@@ -48,10 +49,6 @@
 
         <h1 class="title text-center">Shows</h1>
         <div class="card">
-            <h2>Welcome TV show lovers!</h2>
-            <p>The fiften highest rated shows.</p>
-        </div>
-        <div class="card">
             <table>
                 <thead>
                 <tr>
@@ -64,32 +61,11 @@
                     <th> Homepage </th>
                 </tr>
                 </thead>
-                <tbody>
-                {% for show in top_shows %}
-                    <tr>
-                        <td> <a href="/show/<{{ show['id'] }}>"> {{ show['title'] }}</a> </td>
-                        <td> {{ show['year'] }}</td>
-                        <td> {{ show['runtime'] }} min</td>
-                        <td> {{ '%0.1f' % show['rating']|float }}</td>
-                        <td> {{ show['genres'] }}</td>
-                        <td>
-                            {% if show['trailer'] != None %}
-                                <a href="{{ show['trailer'] }}"> View trailer </a>
-                            {% else %}
-                                No URL
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if show['homepage'] != None %}
-                                <a href="{{ show['homepage'] }}"> View homepage </a>
-                            {% else %}
-                                No URL
-                            {% endif %}
-                        </td>
-                    </tr>
-                {% endfor %}
+                <tbody id="tbody">
                 </tbody>
             </table>
+        </div>
+        <div class="card" id="page-navigation">
         </div>
     </section>
     <footer>
