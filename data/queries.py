@@ -51,6 +51,30 @@ def get_all_shows_w_params(offset, order_by, order_direction):
     ''')
 
 
+def get_show_details(show_id):
+    return data_manager.execute_select("""
+        SELECT shows.id as id,
+             title,
+             EXTRACT(YEAR FROM year) as year,
+             runtime,
+             rating,
+             STRING_AGG(DISTINCT genres.name, ', ') as genres,
+             (
+              SPLIT_PART( STRING_AGG(DISTINCT actors.name, ', '), ',', 1 ) || ', ' ||
+              SPLIT_PART( STRING_AGG(DISTINCT actors.name, ', '), ',', 2 ) || ', ' ||
+              SPLIT_PART( STRING_AGG(DISTINCT actors.name, ', '), ',', 3 ) ) as actors,
+             trailer,
+             overview
+        FROM shows
+        JOIN show_genres ON shows.id = show_genres.show_id
+        JOIN genres ON show_genres.genre_id = genres.id
+        JOIN show_characters on shows.id = show_characters.show_id
+        JOIN actors on show_characters.actor_id = actors.id
+        WHERE shows.id=%(sid)s
+        GROUP BY shows.id, title, year, runtime, rating, trailer, homepage;    
+    """, variables={'sid': show_id}, fetchall=False)
+
+
 @data_connection.connection_handler
 def ez_nem_mukodik(cursor, offset, order_by, order_direction):
     query = sql.SQL("""

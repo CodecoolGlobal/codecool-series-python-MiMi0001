@@ -18,7 +18,7 @@ def design():
 
 
 @app.route('/shows')
-def show():
+def shows():
     return redirect(url_for('most_rated'))
 
 
@@ -41,6 +41,30 @@ def get_shows():
     shows = queries.get_all_shows_w_params(str(offset), str(order_by), str(order_direction))
     print(shows)
     return jsonify(shows)
+
+
+@app.route('/show/<show_id>')
+def show_details(show_id):
+    show = queries.get_show_details(show_id)
+
+    runtime_total_min = int(show['runtime'])
+    runtime_hours = runtime_total_min // 60
+    runtime_min = runtime_total_min % 60
+
+    if runtime_hours == 0:
+        runtime = f'{runtime_min}min'
+    else:
+        if runtime_min == 0:
+            runtime = f'{runtime_hours}h'
+        else:
+            runtime = f'{runtime_hours}h{runtime_min}min'
+
+
+    if show['trailer'] is not None:
+        trailer_id = show['trailer'][-11:]
+        show['trailer'] = f'https://www.youtube.com/embed/{trailer_id}'
+
+    return render_template('show_details.html', show=show, runtime=runtime)
 
 
 def main():
