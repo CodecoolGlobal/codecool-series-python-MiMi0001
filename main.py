@@ -64,7 +64,9 @@ def show_details(show_id):
         trailer_id = show['trailer'][-11:]
         show['trailer'] = f'https://www.youtube.com/embed/{trailer_id}'
 
-    return render_template('show_details.html', show=show, runtime=runtime)
+    seasons = queries.get_seasons(show_id)
+
+    return render_template('show_details.html', show=show, runtime=runtime, seasons=seasons)
 
 
 def main():

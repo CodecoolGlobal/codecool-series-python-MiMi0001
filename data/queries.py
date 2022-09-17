@@ -75,6 +75,14 @@ def get_show_details(show_id):
     """, variables={'sid': show_id}, fetchall=False)
 
 
+def get_seasons(show_id):
+    return data_manager.execute_select("""
+        SELECT season_number, title, overview
+        FROM seasons
+        WHERE show_id = %(sid)s
+        ORDER BY season_number;""", variables={'sid': show_id})
+
+
 @data_connection.connection_handler
 def ez_nem_mukodik(cursor, offset, order_by, order_direction):
     query = sql.SQL("""
