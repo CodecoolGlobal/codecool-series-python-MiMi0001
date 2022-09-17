@@ -83,6 +83,23 @@ def get_seasons(show_id):
         ORDER BY season_number;""", variables={'sid': show_id})
 
 
+def get_actors():
+    return data_manager.execute_select('''
+    SELECT id, name
+    FROM actors
+    ORDER BY birthday
+    LIMIT 100;''')
+
+
+def get_actors_shows(actor_id):
+    return data_manager.execute_select("""
+    SELECT title
+    FROM shows
+    JOIN show_characters on shows.id = show_characters.show_id
+    WHERE actor_id = %(aid)s;
+    """, variables={'aid': actor_id})
+
+
 @data_connection.connection_handler
 def ez_nem_mukodik(cursor, offset, order_by, order_direction):
     query = sql.SQL("""

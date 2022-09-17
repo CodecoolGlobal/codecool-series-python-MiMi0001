@@ -69,6 +69,24 @@ def show_details(show_id):
     return render_template('show_details.html', show=show, runtime=runtime, seasons=seasons)
 
 
+@app.route('/actors')
+def actors():
+    return render_template('actors.html')
+
+
+@app.route('/get-actors')
+def get_actors():
+    actors_list = queries.get_actors()
+    return jsonify(actors_list)
+
+
+@app.route('/get-actors-shows', methods=['POST'])
+def actors_show():
+    actor_id = request.get_json()['actorId']
+    shows_list = queries.get_actors_shows(actor_id)
+    return jsonify(shows_list)
+
+
 def main():
     app.run(
         debug=True,
