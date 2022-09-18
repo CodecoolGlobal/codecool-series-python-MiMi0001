@@ -87,6 +87,17 @@ def actors_show():
     return jsonify(shows_list)
 
 
+@app.route('/ratings')
+def ratings():
+    avg_rating = queries.avg_rating()['avg_rating']
+    shows = queries.show_ratings()
+
+    for show in shows:
+        show['rating'] = show['rating']-avg_rating
+
+    return render_template('ratings.html', avg_rating=avg_rating, shows=shows)
+
+
 def main():
     app.run(
         debug=True,

@@ -12,7 +12,6 @@ function init(){
     pageInfo.tBodyShows = document.getElementById('tbody-shows');
 
     insertActors();
-
 }
 
 

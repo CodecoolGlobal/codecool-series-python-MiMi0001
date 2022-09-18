@@ -100,6 +100,26 @@ def get_actors_shows(actor_id):
     """, variables={'aid': actor_id})
 
 
+def avg_rating():
+    return data_manager.execute_select('''
+    SELECT AVG(rating) as avg_rating
+    FROM shows;
+    ''', fetchall=False)
+
+
+def show_ratings():
+    return data_manager.execute_select('''
+    SELECT title, rating, count(show_id) as actors_count
+    FROM shows
+    JOIN show_characters on shows.id = show_characters.show_id
+    GROUP BY title, rating
+    ORDER BY actors_count DESC
+    LIMIT 10;
+    ''')
+
+
+
+
 @data_connection.connection_handler
 def ez_nem_mukodik(cursor, offset, order_by, order_direction):
     query = sql.SQL("""
