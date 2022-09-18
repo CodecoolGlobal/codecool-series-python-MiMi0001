@@ -98,6 +98,24 @@ def ratings():
     return render_template('ratings.html', avg_rating=avg_rating, shows=shows)
 
 
+@app.route('/ordered-shows', methods= ['GET','POST'])
+def ordered_shows():
+    if request.method == 'GET':
+        return render_template('ordered-shows.html')
+    elif request.method == 'POST':
+        order_direction = request.get_json()['order_dir']
+        shows = queries.ordered_shows(order_direction)
+
+        for show in shows:
+            rating = int(round(float(show['rating']), 0))
+            show['rating'] = ''
+            for i in range(rating):
+                print(i)
+                show['rating'] += '*'
+
+        return jsonify(shows)
+
+
 def main():
     app.run(
         debug=True,

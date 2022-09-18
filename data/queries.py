@@ -118,6 +118,16 @@ def show_ratings():
     ''')
 
 
+def ordered_shows(order_direction):
+    return data_manager.execute_select(f'''
+        SELECT shows.title, rating, COUNT(episodes.id) as ep_count
+        FROM shows
+        JOIN seasons ON shows.id = seasons.show_id
+        JOIN episodes on seasons.id = episodes.season_id
+        GROUP BY shows.title, rating
+        ORDER BY ep_count {order_direction}
+        LIMIT 10;        
+    ''')
 
 
 @data_connection.connection_handler
