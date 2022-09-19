@@ -130,6 +130,25 @@ def ordered_shows(order_direction):
     ''')
 
 
+def get_genres():
+    return data_manager.execute_select(f'''
+        SELECT id, name
+        FROM genres;
+        ''')
+
+
+def filter_actors(actor, genre_id):
+    actor = '%'+actor+'%'
+    return data_manager.execute_select('''
+    SELECT actors.name
+    FROM actors
+    JOIN show_characters ON actors.id = show_characters.actor_id
+    JOIN show_genres ON show_characters.show_id = show_genres.show_id
+    WHERE name ILIKE %(actor)s AND genre_id = %(gid)s  
+    GROUP BY actors.name;
+    ''', variables={'actor': actor, 'gid': genre_id})
+
+
 @data_connection.connection_handler
 def ez_nem_mukodik(cursor, offset, order_by, order_direction):
     query = sql.SQL("""

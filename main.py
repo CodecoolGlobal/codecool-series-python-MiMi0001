@@ -116,6 +116,23 @@ def ordered_shows():
         return jsonify(shows)
 
 
+@app.route('/filter-actors', methods=['GET', 'POST'])
+def filter_actors():
+    if request.method == 'GET':
+        return render_template('filter-actors.html')
+    elif request.method == 'POST':
+        actor = request.get_json() ['actor']
+        genre_id = request.get_json()['genreId']
+        actors_list = queries.filter_actors(actor, genre_id)
+        return jsonify(actors_list)
+
+
+@app.route('/get-genres')
+def get_genres():
+    genres = queries.get_genres()
+    return jsonify(genres)
+
+
 def main():
     app.run(
         debug=True,
