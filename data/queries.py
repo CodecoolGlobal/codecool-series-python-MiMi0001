@@ -149,6 +149,13 @@ def filter_actors(actor, genre_id):
     ''', variables={'actor': actor, 'gid': genre_id})
 
 
+def birthday():
+    return data_manager.execute_select(f'''
+        SELECT id, name, birthday
+        FROM actors
+        WHERE death IS NOT NULL;''')
+
+
 @data_connection.connection_handler
 def ez_nem_mukodik(cursor, offset, order_by, order_direction):
     query = sql.SQL("""
@@ -160,7 +167,7 @@ def ez_nem_mukodik(cursor, offset, order_by, order_direction):
         ORDER BY {oby} {odi}
         LIMIT 15
         OFFSET {ofs};    
-    """).format(oby=sql.Identifier(order_by), odi=sql.Identifier(order_direction), ofs=sql.Literal(offset))
+    """).format(oby=sql.Identifier(order_by), odi=sql.SQL(order_direction), ofs=sql.Literal(offset))
 
     cursor.execute(query)
-    return cursor.fetchall
+    return cursor.fetchall()

@@ -38,9 +38,9 @@ def get_shows():
     offset = request.get_json()['offset']
     order_by = request.get_json()['order_by']
     order_direction = request.get_json()['order_direction']
-    shows = queries.get_all_shows_w_params(str(offset), str(order_by), str(order_direction))
-    print(shows)
-    return jsonify(shows)
+    shows_a = queries.ez_nem_mukodik(str(offset), str(order_by), str(order_direction))
+    print(shows_a)
+    return jsonify(shows_a)
 
 
 @app.route('/show/<show_id>')
@@ -131,6 +131,11 @@ def filter_actors():
 def get_genres():
     genres = queries.get_genres()
     return jsonify(genres)
+
+
+@app.route('/api/')
+def birthday():
+    pass
 
 
 def main():
