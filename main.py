@@ -1,6 +1,5 @@
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, jsonify
 from data import queries
-import math
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -18,7 +17,7 @@ def design():
 
 
 def main():
-    app.run(debug=False)
+    app.run(debug=True)
 
 
 if __name__ == '__main__':
