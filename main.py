@@ -133,11 +133,6 @@ def get_genres():
     return jsonify(genres)
 
 
-@app.route('/api/')
-def birthday():
-    pass
-
-
 def main():
     app.run(
         debug=True,
