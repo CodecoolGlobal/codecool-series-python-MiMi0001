@@ -36,8 +36,6 @@
         <img id="header-logo" src="{{ url_for('static', filename='assets/codecool-logo.png') }}" alt="Codecool Logo">
         <span id="header-title" class="title">Codecool Series DB</span>
         <div id="header-auth">
-            <button type="button" id="bt-register">Register</button>
-            <button type="button" id="bt-login">Login</button>
         </div>
     </header>
     <section>
@@ -56,7 +54,7 @@
             <ul>
                 {% for show in shows %}
                     <li>
-                        <a href="{{ '/tv-show/' + (show['id'] | string) }}">{{ show['title'] }}</a>
+                        <a href="{{ '/show/' + (show['id'] | string) }}">{{ show['title'] }}</a>
                     </li>
                 {% endfor %}
             </ul>
